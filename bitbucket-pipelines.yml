@@ -1,0 +1,25 @@
+image: sidworks/php-deployer-image:php83
+
+pipelines:
+  branches:
+    development:
+      - step:
+          name: Build
+          caches:
+            - composer
+          script:
+            - ssh-keyscan -p 22 example.com >> ~/.ssh/known_hosts
+            - dep build-sw6 -vvv staging
+          after-script:
+            - dep deploy:unlock -vvv staging
+
+      - step:
+          name: Deploy
+          trigger: manual
+          caches:
+            - composer
+          script:
+            - ssh-keyscan -p 22 example.com >> ~/.ssh/known_hosts
+            - dep deploy-sw6 -vvv staging
+          after-script:
+            - dep deploy:unlock -vvv staging
